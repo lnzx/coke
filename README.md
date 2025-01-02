@@ -1,6 +1,6 @@
 # headscale web ui
 
-使用web界面操作headscale,
+简单的 Headscale Web UI
 
 ### 支持功能:
 
@@ -24,9 +24,9 @@
 
 `POST /api/nodes`
 
-`PUT /api/nodes`
+`PUT /api/nodes/:id`
 
-`DELETE /api/nodes`
+`DELETE /api/nodes/:id`
 
 ### user namespace
 

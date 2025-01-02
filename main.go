@@ -1,40 +1,54 @@
 package main
 
 import (
+	"crypto/rand"
+	"crypto/sha256"
+	"encoding/hex"
+	"fmt"
 	"github.com/bytedance/sonic"
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/middleware/keyauth"
+	"github.com/lnzx/coke/api"
 	. "github.com/lnzx/coke/handler"
+	"gopkg.in/ini.v1"
 	"log"
+	"os"
+	"time"
 )
+
+var _profile *api.Profile
+var _token string
+
+func init() {
+	loadConfig()
+}
 
 func main() {
 	app := fiber.New(fiber.Config{
-		JSONEncoder: sonic.Marshal,
-		JSONDecoder: sonic.Unmarshal,
+		JSONEncoder:     sonic.Marshal,
+		JSONDecoder:     sonic.Unmarshal,
+		StructValidator: &structValidator{validate: validator.New()},
 	})
 
 	// /api/login endpoint does not require authentication
 	app.Get("/api/login", Login)
 
-	// /api/* endpoint requires authentication
-	api := app.Group("/api", auth)
+	app.Use(keyauth.New(keyauth.Config{
+		Validator: validate, // header:Authorization
+	}))
 
-	api.Post("/logout", Logout)
-
+	router := app.Group("/api")
+	router.Post("/logout", Logout)
 	// users
-	MountUserRoutes(api)
-
+	MountUserRoutes(router)
 	// preauthkeys
-	api.Get("/preauthkeys", func(c fiber.Ctx) error {
+	router.Get("/preauthkeys", func(c fiber.Ctx) error {
 
 		return c.SendString("login")
 	})
-
 	// nodes
-	api.Get("/nodes", func(c fiber.Ctx) error {
-
-		return c.SendString("login")
-	})
+	MountNodeRoutes(router)
 
 	// SPA (Single Page Application)
 	app.Get("/*", func(c fiber.Ctx) error {
@@ -45,8 +59,69 @@ func main() {
 	log.Fatal(app.Listen(":3000"))
 }
 
-func auth(c fiber.Ctx) error {
-	log.Println("auth...", c.Path())
+func Login(c fiber.Ctx) error {
+	var param = new(api.Profile)
+	var err error
+	if err = c.Bind().Body(param); err != nil { // <- here you receive the validation errors
+		return c.JSON(fiber.ErrBadRequest)
+	}
+	if param.Username != _profile.Username || param.Password != _profile.Password {
+		return c.JSON(fiber.ErrUnauthorized)
+	}
+	_token, err = genToken(param.Password)
+	if err != nil {
+		return c.JSON(fiber.ErrInternalServerError)
+	}
+	return c.JSON(fiber.Map{"token": _token})
+}
 
-	return c.SendString("invalid token")
+func Logout(c fiber.Ctx) error {
+	return c.SendString("logout")
+}
+
+func validate(_ fiber.Ctx, token string) (bool, error) {
+	if token == _token {
+		return true, nil
+	}
+	return false, keyauth.ErrMissingOrMalformedAPIKey
+}
+
+func loadConfig() {
+	_profile = new(api.Profile)
+	if err := ini.MapTo(_profile, "config.ini"); err != nil {
+		log.Printf("Fail to read file: %v", err)
+		os.Exit(1)
+	}
+}
+
+type structValidator struct {
+	validate *validator.Validate
+}
+
+// Validate needs to implement the Validate method
+func (v *structValidator) Validate(out any) error {
+	return v.validate.Struct(out)
+}
+
+func genToken(username string) (string, error) {
+	// 生成一个盐值
+	salt, err := genSalt()
+	if err != nil {
+		return "", err
+	}
+	// 拼接用户名、盐值，时间戳使用逗号作为分隔符
+	token := []byte(fmt.Sprintf("%s,%x,%d", username, salt, time.Now().UnixNano()))
+	hash := sha256.Sum256(token)
+
+	// 返回生成的哈希值的十六进制字符串
+	return hex.EncodeToString(hash[:]), nil
+}
+
+// 生成一个随机的盐值
+func genSalt() ([]byte, error) {
+	salt := make([]byte, 16) // 16 字节的盐值
+	if _, err := rand.Read(salt); err != nil {
+		return nil, err
+	}
+	return salt, nil
 }

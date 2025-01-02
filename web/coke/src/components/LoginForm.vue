@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 <template>
   <Card class="w-full max-w-sm">
     <CardHeader>
-      <CardTitle class="text-2xl"> Login </CardTitle>
+      <CardTitle class="text-2xl"> Login to Headscale </CardTitle>
       <CardDescription> Enter your email below to login to your account. </CardDescription>
     </CardHeader>
     <CardContent class="grid gap-4">
