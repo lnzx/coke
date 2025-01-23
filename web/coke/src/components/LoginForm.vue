@@ -22,7 +22,7 @@ import { Label } from '@/components/ui/label'
       </div>
     </CardContent>
     <CardFooter>
-      <Button class="w-full" @click="() => $router.push('/dash')"> Sign in </Button>
+      <Button class="w-full" @click="() => $router.push('/nodes')"> Sign in </Button>
     </CardFooter>
   </Card>
 </template>
