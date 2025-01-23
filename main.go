@@ -13,6 +13,7 @@ import (
 	. "github.com/lnzx/coke/handler"
 	"gopkg.in/ini.v1"
 	"log"
+	"math/big"
 	"os"
 	"time"
 )
@@ -54,6 +55,22 @@ func main() {
 	app.Get("/*", func(c fiber.Ctx) error {
 		return c.SendFile("web/index.html")
 	})
+
+	str := "2"
+	bigInt := new(big.Int)
+	bigInt, success := bigInt.SetString(str, 10) // 第二个参数是进制，10表示十进制
+	if success {
+		fmt.Println("Big integer:", bigInt)
+		fmt.Println("str len:", len(str))
+		// 获取该大整数的位数
+		bitLength := bigInt.BitLen()
+		fmt.Println("大整数占用的位数:", bitLength)
+
+		result := bigInt.Exp(bigInt, big.NewInt(4), nil)
+		fmt.Println("result:", result)
+	} else {
+		fmt.Println("无法解析该字符串为大整数")
+	}
 
 	// Start the server on port 3000
 	log.Fatal(app.Listen(":3000"))

@@ -6,7 +6,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Input } from '@/components/ui/input'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Plus, CircleUser, Menu, Grip, Search, Server, Earth, Settings, Ellipsis } from 'lucide-vue-next'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Plus, CircleUser, Menu, Grip, Search, Server, Earth, Settings, Ellipsis, Users, CopyIcon } from 'lucide-vue-next'
 import { ref, onMounted } from 'vue'
 
 const logout = () => {
@@ -42,9 +43,10 @@ onMounted(() => {
           <span class="sr-only">headscale</span>
         </a>
 
-        <a href="#" class="flex items-center gap-1 transition-colors hover:text-foreground"><Server class="h-4 w-4" /> Machines </a>
-        <a href="#" class="flex items-center gap-1 transition-colors hover:text-foreground"><Earth class="h-4 w-4" /> DNS </a>
-        <a href="#" class="flex items-center gap-1 transition-colors hover:text-foreground"><Settings class="h-4 w-4" /> Settings </a>
+        <a href="dash" class="flex items-center gap-1 transition-colors hover:text-foreground"><Server class="h-4 w-4" /> Nodes </a>
+        <a href="users" class="flex items-center gap-1 text-muted-foreground transition-colors hover:text-foreground"><Users class="h-4 w-4" /> Users </a>
+        <a href="dns" class="flex items-center gap-1 text-muted-foreground transition-colors hover:text-foreground"><Earth class="h-4 w-4" /> DNS </a>
+        <a href="settings" class="flex items-center text-muted-foreground gap-1 transition-colors hover:text-foreground"><Settings class="h-4 w-4" /> Settings </a>
       </nav>
 
       <Sheet>
@@ -60,8 +62,8 @@ onMounted(() => {
               <Package2 class="h-6 w-6" />
               <span class="sr-only">headscale</span>
             </a>
-            <a href="#" class="hover:text-foreground"> Machines </a>
-            <a href="#" class="text-muted-foreground hover:text-foreground"> Orders </a>
+            <a href="dash" class="hover:text-foreground"> Nodes </a>
+            <a href="#" class="text-muted-foreground hover:text-foreground"> Users </a>
             <a href="#" class="text-muted-foreground hover:text-foreground"> DNS </a>
             <a href="#" class="text-muted-foreground hover:text-foreground"> Settings </a>
           </nav>
@@ -72,7 +74,7 @@ onMounted(() => {
         <form class="ml-auto flex-1 sm:flex-initial">
           <div class="relative">
             <Search class="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input type="search" placeholder="Search machines..." class="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]" />
+            <Input type="search" placeholder="Search..." class="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]" />
           </div>
         </form>
         <DropdownMenu>
@@ -98,24 +100,45 @@ onMounted(() => {
         <Card class="xl:col-span-2">
           <CardHeader class="flex flex-row items-center">
             <div class="grid gap-2">
-              <CardTitle class="text-2xl font-semibold">Machines</CardTitle>
+              <CardTitle class="text-2xl font-semibold">Nodes</CardTitle>
               <CardDescription>
-                <Badge variant="secondary">{{ nodes.length }} machines</Badge>
+                <Badge variant="secondary">{{ nodes.length }} nodes</Badge>
               </CardDescription>
             </div>
-            <Button as-child size="sm" class="ml-auto gap-1">
-              <a href="#"> Add device <Plus class="h-4 w-4" /></a>
-            </Button>
+            <div class="ml-auto gap-1">
+              <Dialog class="ml-auto gap-1">
+                <DialogTrigger as-child>
+                  <Button size="sm"> Add node <Plus class="h-4 w-4" /> </Button>
+                </DialogTrigger>
+                <DialogContent class="sm:max-w-xl">
+                  <DialogHeader>
+                    <DialogTitle>Add node</DialogTitle>
+                    <DialogDescription> To add a new device to your Tailnet, simply install Tailscale on that device and run the following command. </DialogDescription>
+                  </DialogHeader>
+                  <div class="flex items-center space-x-2">
+                    <div class="grid flex-1 gap-2">
+                      <Label for="link" class="sr-only"> Link </Label>
+                      <pre class="rounded-sm overflow-hidden pl-2 pr-3 py-3 bg-gray-100"><code>tailscale up --login-server https://wrt.12bit.xyz</code></pre>
+                    </div>
+                    <Button type="submit" size="sm" class="px-3">
+                      <span class="sr-only">Copy</span>
+                      <CopyIcon class="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <DialogFooter class="sm:justify-start"> </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead class="md:w-1/3 flex-auto md:flex-initial md:shrink-0 w-0 text-ellipsis"> MACHINE </TableHead>
+                  <TableHead class="md:w-1/3 flex-auto md:flex-initial md:shrink-0 w-0 text-ellipsis"> NODE </TableHead>
                   <TableHead class=""> ADDRESSES </TableHead>
                   <TableHead class=""> VERSION </TableHead>
                   <TableHead class="pl-2"> STATUS </TableHead>
-                  <TableHead class=""> <span class="sr-only">Machines action menu</span> </TableHead>
+                  <TableHead class=""> <span class="sr-only">Nodes action menu</span> </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -133,8 +156,8 @@ onMounted(() => {
                         <Ellipsis class="h-5 w-5" />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem>Edit machine name</DropdownMenuItem>
-                        <DropdownMenuItem>Edit machine IPv4</DropdownMenuItem>
+                        <DropdownMenuItem>Edit node name</DropdownMenuItem>
+                        <DropdownMenuItem>Edit node IPv4</DropdownMenuItem>
                         <DropdownMenuItem>Disable key expiry</DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem>Edit ACL tags</DropdownMenuItem>
