@@ -5,7 +5,7 @@ import (
 	"os/exec"
 )
 
-func run(command string) string {
+func run(command string) []byte {
 	cmd := exec.Command("sh", "-c", command)
 
 	var out bytes.Buffer
@@ -13,7 +13,7 @@ func run(command string) string {
 
 	err := cmd.Run()
 	if err != nil {
-		return ""
+		return nil
 	}
-	return out.String()
+	return out.Bytes()
 }

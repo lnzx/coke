@@ -15,7 +15,7 @@ func MountNodeRoutes(router fiber.Router) {
 
 func GetNodes(c fiber.Ctx) error {
 	user := c.Get("user")
-	log.Println(c.Path(), "user:", user)
+	log.Println(c.Path(), "get node user:", user)
 	return c.JSON(api.GetNodes(user))
 }
 

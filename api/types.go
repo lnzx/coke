@@ -14,3 +14,13 @@ type Node struct {
 	Online    bool   `json:"online"`
 	Ip        string `json:"ip"`
 }
+
+type User struct {
+	ID        int       `json:"id"`
+	Name      string    `json:"name"`
+	CreatedAt Timestamp `json:"created_at"`
+}
+
+type Timestamp struct {
+	Seconds int64 `json:"seconds"`
+}
