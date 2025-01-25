@@ -8,12 +8,11 @@ import (
 	"github.com/bytedance/sonic"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v3"
-	"github.com/gofiber/fiber/v3/middleware/keyauth"
+	"github.com/gofiber/fiber/v3/middleware/static"
 	"github.com/lnzx/coke/api"
 	. "github.com/lnzx/coke/handler"
 	"gopkg.in/ini.v1"
 	"log"
-	"math/big"
 	"os"
 	"time"
 )
@@ -33,61 +32,57 @@ func main() {
 	})
 
 	// /api/login endpoint does not require authentication
-	app.Get("/api/login", Login)
+	app.Post("/api/login", Login)
 
-	app.Use(keyauth.New(keyauth.Config{
-		Validator: validate, // header:Authorization
-	}))
+	router := app.Group("/api", func(c fiber.Ctx) error {
+		path := c.Path()
+		fmt.Println("api group path:", path)
 
-	router := app.Group("/api")
+		token := c.Get(fiber.HeaderAuthorization)
+		fmt.Println("_token:", _token)
+		fmt.Println("token:", token)
+
+		return c.Next()
+	})
 	router.Post("/logout", Logout)
+
 	// users
 	MountUserRoutes(router)
+
+	// nodes
+	MountNodeRoutes(router)
+
 	// preauthkeys
 	router.Get("/preauthkeys", func(c fiber.Ctx) error {
 
 		return c.SendString("login")
 	})
-	// nodes
-	MountNodeRoutes(router)
 
-	// SPA (Single Page Application)
+	app.Use("/", static.New("", static.Config{
+		FS: os.DirFS("web/dist"),
+	}))
+
 	app.Get("/*", func(c fiber.Ctx) error {
-		return c.SendFile("web/index.html")
+		return c.SendFile("web/dist/index.html")
 	})
 
-	str := "2"
-	bigInt := new(big.Int)
-	bigInt, success := bigInt.SetString(str, 10) // 第二个参数是进制，10表示十进制
-	if success {
-		fmt.Println("Big integer:", bigInt)
-		fmt.Println("str len:", len(str))
-		// 获取该大整数的位数
-		bitLength := bigInt.BitLen()
-		fmt.Println("大整数占用的位数:", bitLength)
-
-		result := bigInt.Exp(bigInt, big.NewInt(4), nil)
-		fmt.Println("result:", result)
-	} else {
-		fmt.Println("无法解析该字符串为大整数")
-	}
-
-	// Start the server on port 3000
-	log.Fatal(app.Listen(":3000"))
+	// Start the server
+	log.Fatal(app.Listen(_profile.Addr + ":" + _profile.Port))
 }
 
 func Login(c fiber.Ctx) error {
 	var param = new(api.Profile)
 	var err error
 	if err = c.Bind().Body(param); err != nil { // <- here you receive the validation errors
-		return c.JSON(fiber.ErrBadRequest)
+		log.Println(err)
+		return c.SendStatus(fiber.StatusBadRequest)
 	}
 	if param.Username != _profile.Username || param.Password != _profile.Password {
-		return c.JSON(fiber.ErrUnauthorized)
+		return c.SendStatus(fiber.StatusUnauthorized)
 	}
 	_token, err = genToken(param.Password)
 	if err != nil {
-		return c.JSON(fiber.ErrInternalServerError)
+		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 	return c.JSON(fiber.Map{"token": _token})
 }
@@ -96,19 +91,13 @@ func Logout(c fiber.Ctx) error {
 	return c.SendString("logout")
 }
 
-func validate(_ fiber.Ctx, token string) (bool, error) {
-	if token == _token {
-		return true, nil
-	}
-	return false, keyauth.ErrMissingOrMalformedAPIKey
-}
-
 func loadConfig() {
 	_profile = new(api.Profile)
 	if err := ini.MapTo(_profile, "config.ini"); err != nil {
 		log.Printf("Fail to read file: %v", err)
 		os.Exit(1)
 	}
+	fmt.Printf("%s\n", _profile)
 }
 
 type structValidator struct {
@@ -129,9 +118,8 @@ func genToken(username string) (string, error) {
 	// 拼接用户名、盐值，时间戳使用逗号作为分隔符
 	token := []byte(fmt.Sprintf("%s,%x,%d", username, salt, time.Now().UnixNano()))
 	hash := sha256.Sum256(token)
-
 	// 返回生成的哈希值的十六进制字符串
-	return hex.EncodeToString(hash[:]), nil
+	return "tk" + hex.EncodeToString(hash[16:]), nil
 }
 
 // 生成一个随机的盐值

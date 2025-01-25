@@ -1,7 +1,9 @@
 package handler
 
 import (
+	"fmt"
 	"github.com/gofiber/fiber/v3"
+	"github.com/lnzx/coke/api"
 )
 
 func MountUserRoutes(router fiber.Router) {
@@ -12,7 +14,9 @@ func MountUserRoutes(router fiber.Router) {
 }
 
 func getUsers(c fiber.Ctx) error {
-	return c.SendString("user list")
+	fmt.Println("get users list")
+	users := api.ListUsers()
+	return c.JSON(users)
 }
 
 func addUser(c fiber.Ctx) error {

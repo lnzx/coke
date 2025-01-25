@@ -1,11 +1,20 @@
-<script setup lang="ts">
+<script setup>
 import { Input } from '@/components/ui/input'
-import { CircleUser, Search } from 'lucide-vue-next'
+import { CircleUser, Search, LogOut } from 'lucide-vue-next'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import AppNav from '@/components/AppNav.vue'
 
-const logout = () => {
-  location.href = '/'
+const logout = async () => {
+  const rsp = await fetch('/api/logout', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+
+  if (rsp.ok) {
+    location.href = '/'
+  }
 }
 </script>
 
@@ -27,12 +36,13 @@ const logout = () => {
             <span class="sr-only">Toggle user menu</span>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent align="end" class="w-40">
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Profile</DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem @click="logout">Logout</DropdownMenuItem>
+          <DropdownMenuItem @click="logout" class="flex justify-between items-center">
+            <span>Log out</span>
+            <DropdownMenuShortcut><LogOut class="h-5 w-5" /></DropdownMenuShortcut>
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

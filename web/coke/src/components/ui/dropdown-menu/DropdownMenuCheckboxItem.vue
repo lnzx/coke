@@ -1,11 +1,18 @@
-<script setup lang="ts">
+<script setup>
 import { cn } from '@/lib/utils'
 import { CheckIcon } from '@radix-icons/vue'
-import { DropdownMenuCheckboxItem, type DropdownMenuCheckboxItemEmits, type DropdownMenuCheckboxItemProps, DropdownMenuItemIndicator, useForwardPropsEmits } from 'radix-vue'
-import { computed, type HTMLAttributes } from 'vue'
+import { DropdownMenuCheckboxItem, DropdownMenuItemIndicator, useForwardPropsEmits } from 'radix-vue'
+import { computed } from 'vue'
 
-const props = defineProps<DropdownMenuCheckboxItemProps & { class?: HTMLAttributes['class'] }>()
-const emits = defineEmits<DropdownMenuCheckboxItemEmits>()
+const props = defineProps({
+  checked: { type: [Boolean, String], required: false },
+  disabled: { type: Boolean, required: false },
+  textValue: { type: String, required: false },
+  asChild: { type: Boolean, required: false },
+  as: { type: null, required: false },
+  class: { type: null, required: false },
+})
+const emits = defineEmits(['select', 'update:checked'])
 
 const delegatedProps = computed(() => {
   const { class: _, ...delegated } = props

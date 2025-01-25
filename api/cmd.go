@@ -1,11 +1,11 @@
-package handler
+package api
 
 import (
 	"bytes"
 	"os/exec"
 )
 
-func run(command string) (string, error) {
+func run(command string) string {
 	cmd := exec.Command("sh", "-c", command)
 
 	var out bytes.Buffer
@@ -13,7 +13,7 @@ func run(command string) (string, error) {
 
 	err := cmd.Run()
 	if err != nil {
-		return "", err
+		return ""
 	}
-	return out.String(), nil
+	return out.String()
 }

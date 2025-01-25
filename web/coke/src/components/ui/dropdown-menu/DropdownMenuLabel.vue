@@ -1,9 +1,14 @@
-<script setup lang="ts">
+<script setup>
 import { cn } from '@/lib/utils'
-import { DropdownMenuLabel, type DropdownMenuLabelProps, useForwardProps } from 'radix-vue'
-import { computed, type HTMLAttributes } from 'vue'
+import { DropdownMenuLabel, useForwardProps } from 'radix-vue'
+import { computed } from 'vue'
 
-const props = defineProps<DropdownMenuLabelProps & { class?: HTMLAttributes['class']; inset?: boolean }>()
+const props = defineProps({
+  asChild: { type: Boolean, required: false },
+  as: { type: null, required: false },
+  class: { type: null, required: false },
+  inset: { type: Boolean, required: false },
+})
 
 const delegatedProps = computed(() => {
   const { class: _, ...delegated } = props

@@ -1,22 +1,25 @@
-<script setup lang="ts">
+<script setup>
 import { cn } from '@/lib/utils'
 import { Cross2Icon } from '@radix-icons/vue'
-import { DialogClose, DialogContent, type DialogContentEmits, type DialogContentProps, DialogOverlay, DialogPortal, useForwardPropsEmits } from 'radix-vue'
-import { computed, type HTMLAttributes } from 'vue'
-import { type SheetVariants, sheetVariants } from '.'
-
-interface SheetContentProps extends DialogContentProps {
-  class?: HTMLAttributes['class']
-  side?: SheetVariants['side']
-}
+import { DialogClose, DialogContent, DialogOverlay, DialogPortal, useForwardPropsEmits } from 'radix-vue'
+import { computed } from 'vue'
+import { sheetVariants } from '.'
 
 defineOptions({
   inheritAttrs: false,
 })
 
-const props = defineProps<SheetContentProps>()
+const props = defineProps({
+  class: { type: null, required: false },
+  side: { type: null, required: false },
+  forceMount: { type: Boolean, required: false },
+  trapFocus: { type: Boolean, required: false },
+  disableOutsidePointerEvents: { type: Boolean, required: false },
+  asChild: { type: Boolean, required: false },
+  as: { type: null, required: false },
+})
 
-const emits = defineEmits<DialogContentEmits>()
+const emits = defineEmits(['escapeKeyDown', 'pointerDownOutside', 'focusOutside', 'interactOutside', 'openAutoFocus', 'closeAutoFocus'])
 
 const delegatedProps = computed(() => {
   const { class: _, side, ...delegated } = props

@@ -1,12 +1,28 @@
-<script setup lang="ts">
+<script setup>
 import { cn } from '@/lib/utils'
-import { DropdownMenuContent, type DropdownMenuContentEmits, type DropdownMenuContentProps, DropdownMenuPortal, useForwardPropsEmits } from 'radix-vue'
-import { computed, type HTMLAttributes } from 'vue'
+import { DropdownMenuContent, DropdownMenuPortal, useForwardPropsEmits } from 'radix-vue'
+import { computed } from 'vue'
 
-const props = withDefaults(defineProps<DropdownMenuContentProps & { class?: HTMLAttributes['class'] }>(), {
-  sideOffset: 4,
+const props = defineProps({
+  forceMount: { type: Boolean, required: false },
+  loop: { type: Boolean, required: false },
+  side: { type: null, required: false },
+  sideOffset: { type: Number, required: false, default: 4 },
+  align: { type: null, required: false },
+  alignOffset: { type: Number, required: false },
+  avoidCollisions: { type: Boolean, required: false },
+  collisionBoundary: { type: null, required: false },
+  collisionPadding: { type: [Number, Object], required: false },
+  arrowPadding: { type: Number, required: false },
+  sticky: { type: String, required: false },
+  hideWhenDetached: { type: Boolean, required: false },
+  updatePositionStrategy: { type: String, required: false },
+  prioritizePosition: { type: Boolean, required: false },
+  asChild: { type: Boolean, required: false },
+  as: { type: null, required: false },
+  class: { type: null, required: false },
 })
-const emits = defineEmits<DropdownMenuContentEmits>()
+const emits = defineEmits(['escapeKeyDown', 'pointerDownOutside', 'focusOutside', 'interactOutside', 'closeAutoFocus'])
 
 const delegatedProps = computed(() => {
   const { class: _, ...delegated } = props

@@ -1,4 +1,4 @@
-import tailwindcssAnimate from 'tailwindcss-animate'
+import animate from 'tailwindcss-animate'
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -6,12 +6,7 @@ export default {
   safelist: ['dark'],
   prefix: '',
 
-  content: [
-    './pages/**/*.{ts,tsx,vue}',
-    './components/**/*.{ts,tsx,vue}',
-    './app/**/*.{ts,tsx,vue}',
-    './src/**/*.{ts,tsx,vue}',
-  ],
+  content: ['./pages/**/*.{js,jsx,vue}', './components/**/*.{js,jsx,vue}', './app/**/*.{js,jsx,vue}', './src/**/*.{js,jsx,vue}'],
 
   theme: {
     container: {
@@ -89,5 +84,5 @@ export default {
       },
     },
   },
-  plugins: [tailwindcssAnimate],
+  plugins: [animate],
 }

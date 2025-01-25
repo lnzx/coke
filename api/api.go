@@ -8,7 +8,12 @@ const (
 	list_node   = "headscale nodes list -o json-line"
 	rename_node = "headscale nodes rename %s -i %d"
 	delete_node = "headscale nodes delete -i %d --force"
+	list_users  = "headscale users list -o json"
 )
+
+func ListUsers() string {
+	return run(list_users)
+}
 
 func GetNodes(user string) string {
 	if user == "" {
