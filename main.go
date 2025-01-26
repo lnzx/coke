@@ -11,17 +11,17 @@ import (
 	"github.com/gofiber/fiber/v3/middleware/static"
 	"github.com/lnzx/coke/api"
 	. "github.com/lnzx/coke/handler"
-	"gopkg.in/ini.v1"
+	"github.com/spf13/viper"
 	"log"
 	"os"
 	"time"
 )
 
-var _profile *api.Profile
+var C api.Config
 var _token string
 
 func init() {
-	loadConfig()
+	readConfig()
 }
 
 func main() {
@@ -67,7 +67,7 @@ func main() {
 	})
 
 	// Start the server
-	log.Fatal(app.Listen(_profile.Addr + ":" + _profile.Port))
+	log.Fatal(app.Listen(C.Addr + ":" + C.Port))
 }
 
 func Login(c fiber.Ctx) error {
@@ -77,7 +77,7 @@ func Login(c fiber.Ctx) error {
 		log.Println(err)
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
-	if param.Username != _profile.Username || param.Password != _profile.Password {
+	if param.Username != C.Username || param.Password != C.Password {
 		return c.SendStatus(fiber.StatusUnauthorized)
 	}
 	_token, err = genToken(param.Password)
@@ -91,13 +91,17 @@ func Logout(c fiber.Ctx) error {
 	return c.SendString("logout")
 }
 
-func loadConfig() {
-	_profile = new(api.Profile)
-	if err := ini.MapTo(_profile, "config.ini"); err != nil {
-		log.Printf("Fail to read file: %v", err)
-		os.Exit(1)
+func readConfig() {
+	viper.SetConfigName("config")
+	viper.AddConfigPath(".")
+
+	if err := viper.ReadInConfig(); err != nil {
+		log.Fatalf("Error reading config file, %s", err)
 	}
-	fmt.Printf("%s\n", _profile)
+
+	if err := viper.Unmarshal(&C); err != nil {
+		log.Fatalf("unable to decode into struct, %v", err)
+	}
 }
 
 type structValidator struct {

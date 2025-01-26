@@ -3,8 +3,13 @@ package api
 type Profile struct {
 	Username string `ini:"username" validate:"required"`
 	Password string `ini:"password" validate:"required"`
-	Addr     string `ini:"addr"`
-	Port     string `ini:"port"`
+}
+
+type Config struct {
+	Username string
+	Password string
+	Addr     string
+	Port     string
 }
 
 type Node struct {
