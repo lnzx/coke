@@ -16,7 +16,7 @@ const api = useApi()
 const nodes = ref([])
 const getNodes = () => {
   api.get('/api/nodes').then((rsp) => {
-    nodes.value = rsp.data
+    nodes.value = rsp.data.nodes
   })
 }
 getNodes()
