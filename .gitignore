@@ -2,6 +2,7 @@
 *.iml
 
 web/dist/
+web/coke/dist.zip
 
 coke
 coke.exe
