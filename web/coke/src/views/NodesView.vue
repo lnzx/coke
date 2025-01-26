@@ -72,7 +72,7 @@ getNodes()
             <TableBody>
               <TableRow v-for="node in nodes" :key="node.id">
                 <TableCell class="w-[100px]">{{ node.name }}</TableCell>
-                <TableCell> {{ node.ip }} </TableCell>
+                <TableCell> {{ node.ip_addresses[0] }} </TableCell>
                 <TableCell class=""> 1.78.1 </TableCell>
                 <TableCell>
                   <span class="inline-block w-2 h-2 rounded-full mr-1" :class="node.online ? 'bg-green-300 dark:bg-green-400' : 'bg-gray-300 dark:bg-gray-500'"></span>

@@ -8,11 +8,11 @@ type Profile struct {
 }
 
 type Node struct {
-	Id        int    `json:"id"`
-	Name      string `json:"name"`
-	GivenName string `json:"given_name"`
-	Online    bool   `json:"online"`
-	Ip        string `json:"ip"`
+	Id          int      `json:"id"`
+	Name        string   `json:"name"`
+	GivenName   string   `json:"given_name"`
+	Online      bool     `json:"online"`
+	IPAddresses []string `json:"ip_addresses"`
 }
 
 type User struct {
