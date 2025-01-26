@@ -39,9 +39,9 @@ func main() {
 		fmt.Println("api group path:", path)
 
 		token := c.Get(fiber.HeaderAuthorization)
-		fmt.Println("_token:", _token)
-		fmt.Println("token:", token)
-
+		if token == "" || _token == "" || token != _token {
+			return c.SendStatus(fiber.StatusUnauthorized)
+		}
 		return c.Next()
 	})
 	router.Post("/logout", Logout)
