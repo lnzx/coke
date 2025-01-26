@@ -3,18 +3,13 @@ import { Input } from '@/components/ui/input'
 import { CircleUser, Search, LogOut } from 'lucide-vue-next'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import AppNav from '@/components/AppNav.vue'
+import { useUserSession } from '@/stores/userSession'
 
-const logout = async () => {
-  const rsp = await fetch('/api/logout', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
+const userSession = useUserSession()
 
-  if (rsp.ok) {
-    location.href = '/'
-  }
+const logout = () => {
+  userSession.clearToken()
+  location.href = '/'
 }
 </script>
 
