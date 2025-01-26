@@ -15,7 +15,7 @@ const api = useApi()
 const users = ref([])
 const getUsers = () => {
   api.get('/api/users').then((rsp) => {
-    users.value = rsp.data
+    users.value = rsp.data.users
   })
 }
 

@@ -17,7 +17,7 @@ func ListUsers() []User {
 	bytes := run(list_users)
 	err := sonic.Unmarshal(bytes, &users)
 	if err != nil {
-		return nil
+		return []User{}
 	}
 	return users
 }
@@ -27,7 +27,7 @@ func GetNodes(user string) []Node {
 	if user == "" {
 		bytes := run(list_node)
 		if err := sonic.Unmarshal(bytes, &nodes); err != nil {
-			return nil
+			return []Node{}
 		}
 		return nodes
 	}

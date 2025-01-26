@@ -16,7 +16,9 @@ func MountUserRoutes(router fiber.Router) {
 func getUsers(c fiber.Ctx) error {
 	fmt.Println("get users list")
 	users := api.ListUsers()
-	return c.JSON(users)
+	return c.JSON(fiber.Map{
+		"users": users,
+	})
 }
 
 func addUser(c fiber.Ctx) error {
